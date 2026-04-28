@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DSA Sorting Visualizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-bracket">{</span>
+        <span class="logo-text">DSA</span>
+        <span class="logo-bracket">}</span>
+        <span class="logo-sub">Sorting Visualizer</span>
+      </div>
+      <div class="header-meta">
+        <span class="badge">HTML · CSS · JS</span>
+        <span class="badge badge-green">v1.0</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="control-panel">
+      <div class="control-group">
+        <label class="control-label">Algorithm</label>
+        <div class="algo-tabs" id="algoTabs">
+          <button class="algo-tab active" data-algo="bubble">Bubble Sort</button>
+          <button class="algo-tab" data-algo="selection">Selection Sort</button>
+          <button class="algo-tab" data-algo="insertion">Insertion Sort</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Array Size — <span id="sizeVal">30</span></label>
+        <input type="range" id="arraySize" min="10" max="80" value="30" class="slider">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Speed — <span id="speedVal">Medium</span></label>
+        <input type="range" id="speed" min="1" max="5" value="3" class="slider">
+      </div>
+
+      <div class="control-actions">
+        <button class="btn btn-outline" id="generateBtn">↺ New Array</button>
+        <button class="btn btn-primary" id="sortBtn">▶ Sort</button>
+      </div>
+    </section>
+
+    <div class="info-bar">
+      <div class="info-item">
+        <span class="info-label">Algorithm</span>
+        <span class="info-value" id="infoAlgo">Bubble Sort</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Comparisons</span>
+        <span class="info-value mono" id="infoComparisons">0</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Swaps</span>
+        <span class="info-value mono" id="infoSwaps">0</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Status</span>
+        <span class="info-value status-idle" id="infoStatus">Idle</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Time Complexity</span>
+        <span class="info-value mono" id="infoComplexity">O(n²)</span>
+      </div>
+    </div>
+
+    <div class="visualizer-wrap">
+      <div class="visualizer" id="visualizer"></div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot dot-default"></span>Unsorted</div>
+      <div class="legend-item"><span class="legend-dot dot-comparing"></span>Comparing</div>
+      <div class="legend-item"><span class="legend-dot dot-swapping"></span>Swapping</div>
+      <div class="legend-item"><span class="legend-dot dot-sorted"></span>Sorted</div>
+      <div class="legend-item"><span class="legend-dot dot-pivot"></span>Pivot / Selected</div>
+    </div>
+
+    <section class="algo-cards">
+      <div class="algo-card" id="card-bubble">
+        <div class="card-tag">O(n²)</div>
+        <h3>Bubble Sort</h3>
+        <p>Repeatedly swaps adjacent elements if they are in the wrong order. Simple but slow — like bubbles rising to the surface.</p>
+        <div class="card-stats">
+          <span>Best: O(n)</span>
+          <span>Avg: O(n²)</span>
+          <span>Space: O(1)</span>
+        </div>
+      </div>
+      <div class="algo-card" id="card-selection">
+        <div class="card-tag">O(n²)</div>
+        <h3>Selection Sort</h3>
+        <p>Finds the minimum element and places it at the beginning repeatedly. Makes fewer swaps than Bubble Sort.</p>
+        <div class="card-stats">
+          <span>Best: O(n²)</span>
+          <span>Avg: O(n²)</span>
+          <span>Space: O(1)</span>
+        </div>
+      </div>
+      <div class="algo-card" id="card-insertion">
+        <div class="card-tag">O(n²)</div>
+        <h3>Insertion Sort</h3>
+        <p>Builds a sorted array one item at a time by inserting each element into its correct position. Efficient for small arrays.</p>
+        <div class="card-stats">
+          <span>Best: O(n)</span>
+          <span>Avg: O(n²)</span>
+          <span>Space: O(1)</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>Built with HTML · CSS · JavaScript</span>
+    <span class="footer-dot">·</span>
+    <span>DSA Sorting Visualizer</span>
+    <span class="footer-dot">·</span>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
