@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DSA Sorting Visualizer</title>
+  <title>SortLab — Algorithm Performance & Decision Lab</title>
+  <meta name="description" content="Interactive sorting algorithm visualizer and non-animated benchmarking lab. Analyze runtime, comparisons, swaps, and memory complexity on identical datasets.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,48 +18,64 @@
     <div class="header-inner">
       <div class="logo">
         <span class="logo-bracket">{</span>
-        <span class="logo-text">DSA</span>
+        <span class="logo-text">SortLab</span>
         <span class="logo-bracket">}</span>
-        <span class="logo-sub">Sorting Visualizer</span>
+        <span class="logo-sub">Algorithm Performance &amp; Decision Lab</span>
       </div>
       <div class="header-meta">
-        <span class="badge">HTML · CSS · JS</span>
-        <span class="badge badge-green">v1.0</span>
+        <span class="badge">Vanilla JS</span>
+        <span class="badge badge-accent">Benchmarking Suite</span>
+        <span class="badge badge-green">v2.0</span>
       </div>
     </div>
   </header>
 
   <main>
 
-    <section class="control-panel">
+    <!-- SECTION: VISUALIZER CONTROLS -->
+    <section class="control-panel" aria-label="Visualizer Controls">
       <div class="control-group">
-        <label class="control-label">Algorithm</label>
-        <div class="algo-tabs" id="algoTabs">
-          <button class="algo-tab active" data-algo="bubble">Bubble Sort</button>
-          <button class="algo-tab" data-algo="selection">Selection Sort</button>
-          <button class="algo-tab" data-algo="insertion">Insertion Sort</button>
+        <label class="control-label" for="algoTabs">Algorithm</label>
+        <div class="algo-tabs" id="algoTabs" role="tablist">
+          <button class="algo-tab active" data-algo="bubble" role="tab" aria-selected="true">Bubble Sort</button>
+          <button class="algo-tab" data-algo="selection" role="tab" aria-selected="false">Selection Sort</button>
+          <button class="algo-tab" data-algo="insertion" role="tab" aria-selected="false">Insertion Sort</button>
+          <button class="algo-tab" data-algo="merge" role="tab" aria-selected="false">Merge Sort</button>
+          <button class="algo-tab" data-algo="quick" role="tab" aria-selected="false">Quick Sort</button>
         </div>
       </div>
 
       <div class="control-group">
-        <label class="control-label">Array Size — <span id="sizeVal">30</span></label>
+        <label class="control-label" for="inputCondition">Input Condition</label>
+        <select id="inputCondition" class="control-select">
+          <option value="random">Random Distribution</option>
+          <option value="nearly_sorted">Nearly Sorted (~90%)</option>
+          <option value="sorted">Already Sorted</option>
+          <option value="reversed">Reverse Sorted</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="arraySize">Array Size — <span id="sizeVal">30</span></label>
         <input type="range" id="arraySize" min="10" max="80" value="30" class="slider">
       </div>
 
       <div class="control-group">
-        <label class="control-label">Speed — <span id="speedVal">Medium</span></label>
+        <label class="control-label" for="speed">Animation Speed — <span id="speedVal">Medium</span></label>
         <input type="range" id="speed" min="1" max="5" value="3" class="slider">
       </div>
 
       <div class="control-actions">
-        <button class="btn btn-outline" id="generateBtn">↺ New Array</button>
-        <button class="btn btn-primary" id="sortBtn">▶ Sort</button>
+        <button class="btn btn-outline" id="resetBtn" title="Restore the exact initial array before sorting">⟲ Reset Array</button>
+        <button class="btn btn-outline" id="generateBtn" title="Generate a new dataset using selected input condition">↺ New Array</button>
+        <button class="btn btn-primary" id="sortBtn">▶ Start Sort</button>
       </div>
     </section>
 
-    <div class="info-bar">
+    <!-- SECTION: LIVE STATS BAR -->
+    <div class="info-bar" aria-label="Sorting Statistics">
       <div class="info-item">
-        <span class="info-label">Algorithm</span>
+        <span class="info-label">Active Algorithm</span>
         <span class="info-value" id="infoAlgo">Bubble Sort</span>
       </div>
       <div class="info-item">
@@ -69,6 +87,10 @@
         <span class="info-value mono" id="infoSwaps">0</span>
       </div>
       <div class="info-item">
+        <span class="info-label">Array Writes</span>
+        <span class="info-value mono" id="infoWrites">0</span>
+      </div>
+      <div class="info-item">
         <span class="info-label">Status</span>
         <span class="info-value status-idle" id="infoStatus">Idle</span>
       </div>
@@ -78,47 +100,182 @@
       </div>
     </div>
 
+    <!-- SECTION: VISUALIZER CANVAS -->
     <div class="visualizer-wrap">
-      <div class="visualizer" id="visualizer"></div>
+      <div class="visualizer" id="visualizer" aria-label="Array Visualization"></div>
     </div>
 
+    <!-- SECTION: LEGEND -->
     <div class="legend">
       <div class="legend-item"><span class="legend-dot dot-default"></span>Unsorted</div>
       <div class="legend-item"><span class="legend-dot dot-comparing"></span>Comparing</div>
-      <div class="legend-item"><span class="legend-dot dot-swapping"></span>Swapping</div>
+      <div class="legend-item"><span class="legend-dot dot-swapping"></span>Swapping / Writing</div>
+      <div class="legend-item"><span class="legend-dot dot-pivot"></span>Pivot / Range</div>
       <div class="legend-item"><span class="legend-dot dot-sorted"></span>Sorted</div>
-      <div class="legend-item"><span class="legend-dot dot-pivot"></span>Pivot / Selected</div>
     </div>
 
-    <section class="algo-cards">
+    <!-- SECTION: BENCHMARK & COMPARISON LAB -->
+    <section class="benchmark-section" id="benchmarkSection" aria-label="Algorithm Benchmark and Comparison Lab">
+      <div class="benchmark-header">
+        <div class="benchmark-title-wrap">
+          <div class="benchmark-badge">DECISION LAB</div>
+          <h2>Performance Benchmark &amp; Comparison</h2>
+          <p class="benchmark-desc">
+            Benchmark selected algorithms synchronously on identical clones of the current dataset without DOM rendering overhead.
+            Inspect precise execution runtime, comparisons, swaps, and memory writes to inform architectural decisions.
+          </p>
+        </div>
+        <div class="benchmark-controls">
+          <button class="btn btn-primary" id="runBenchmarkBtn">⚡ Run Benchmark</button>
+        </div>
+      </div>
+
+      <div class="benchmark-toolbar">
+        <div class="algo-selectors" id="algoSelectors">
+          <span class="selector-heading">Algorithms to Compare:</span>
+          <label class="checkbox-label">
+            <input type="checkbox" class="bench-checkbox" value="bubble" checked> Bubble
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" class="bench-checkbox" value="selection" checked> Selection
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" class="bench-checkbox" value="insertion" checked> Insertion
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" class="bench-checkbox" value="merge" checked> Merge
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" class="bench-checkbox" value="quick" checked> Quick
+          </label>
+        </div>
+        <div class="benchmark-quick-actions">
+          <button class="btn-text" id="selectAllBenchBtn">Select All</button>
+          <span class="text-separator">·</span>
+          <button class="btn-text" id="deselectAllBenchBtn">Clear All</button>
+        </div>
+      </div>
+
+      <!-- BENCHMARK RESULTS CONTAINER -->
+      <div class="benchmark-results-wrap" id="benchmarkResultsWrap">
+        <div class="benchmark-empty" id="benchmarkEmptyState">
+          <span class="empty-icon">📊</span>
+          <h3>Ready to Benchmark</h3>
+          <p>Click <strong>"⚡ Run Benchmark"</strong> to test selected algorithms on the active dataset (<span id="benchDatasetDesc">30 elements · Random</span>).</p>
+        </div>
+
+        <div class="benchmark-content hidden" id="benchmarkContent">
+          <!-- Summary Cards / Highlights -->
+          <div class="benchmark-summary-bar" id="benchmarkSummaryBar"></div>
+
+          <!-- Comparison Table -->
+          <div class="table-responsive">
+            <table class="benchmark-table" id="benchmarkTable">
+              <thead>
+                <tr>
+                  <th>Algorithm</th>
+                  <th>Status</th>
+                  <th>Runtime</th>
+                  <th>Speed Comparison</th>
+                  <th>Comparisons</th>
+                  <th>Swaps</th>
+                  <th>Writes / Moves</th>
+                  <th>Time (Best / Avg / Worst)</th>
+                  <th>Space</th>
+                </tr>
+              </thead>
+              <tbody id="benchmarkTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Device Disclaimer -->
+          <div class="benchmark-disclaimer">
+            <span class="disclaimer-icon">ℹ</span>
+            <span>
+              <strong>Measurement Note:</strong> Non-animated benchmarks run in pure JavaScript without DOM animation delay on identical copies of the initial dataset.
+              Runtimes are calculated via the High Resolution Time API (<code>performance.now()</code>) and may fluctuate depending on CPU throttling, background processes, and browser JavaScript engines (V8, SpiderMonkey, JavaScriptCore).
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: ALGORITHM COMPLEXITY REFERENCE CARDS -->
+    <section class="algo-cards" aria-label="Algorithm Reference Cards">
       <div class="algo-card" id="card-bubble">
-        <div class="card-tag">O(n²)</div>
+        <div class="card-header-line">
+          <div class="card-tag">O(n²)</div>
+          <span class="card-stability">Stable</span>
+        </div>
         <h3>Bubble Sort</h3>
-        <p>Repeatedly swaps adjacent elements if they are in the wrong order. Simple but slow — like bubbles rising to the surface.</p>
+        <p>Repeatedly steps through the array, compares adjacent elements, and swaps them if they are in the wrong order. Quadratic worst/average cases make it impractical for large sets.</p>
         <div class="card-stats">
           <span>Best: O(n)</span>
           <span>Avg: O(n²)</span>
+          <span>Worst: O(n²)</span>
           <span>Space: O(1)</span>
         </div>
       </div>
+
       <div class="algo-card" id="card-selection">
-        <div class="card-tag">O(n²)</div>
+        <div class="card-header-line">
+          <div class="card-tag">O(n²)</div>
+          <span class="card-stability">Unstable</span>
+        </div>
         <h3>Selection Sort</h3>
-        <p>Finds the minimum element and places it at the beginning repeatedly. Makes fewer swaps than Bubble Sort.</p>
+        <p>Repeatedly scans the unsorted partition to find the minimum element and moves it to the sorted prefix. Performs minimal swaps (O(n)) but always requires O(n²) comparisons.</p>
         <div class="card-stats">
           <span>Best: O(n²)</span>
           <span>Avg: O(n²)</span>
+          <span>Worst: O(n²)</span>
           <span>Space: O(1)</span>
         </div>
       </div>
+
       <div class="algo-card" id="card-insertion">
-        <div class="card-tag">O(n²)</div>
+        <div class="card-header-line">
+          <div class="card-tag">O(n²)</div>
+          <span class="card-stability">Stable</span>
+        </div>
         <h3>Insertion Sort</h3>
-        <p>Builds a sorted array one item at a time by inserting each element into its correct position. Efficient for small arrays.</p>
+        <p>Builds the final sorted array one item at a time by inserting each element into its proper position. Highly efficient for small or nearly sorted datasets (adaptive O(n) best case).</p>
         <div class="card-stats">
           <span>Best: O(n)</span>
           <span>Avg: O(n²)</span>
+          <span>Worst: O(n²)</span>
           <span>Space: O(1)</span>
+        </div>
+      </div>
+
+      <div class="algo-card" id="card-merge">
+        <div class="card-header-line">
+          <div class="card-tag tag-violet">O(n log n)</div>
+          <span class="card-stability">Stable</span>
+        </div>
+        <h3>Merge Sort</h3>
+        <p>Divide-and-conquer algorithm that recursively divides array into halves, sorts them, and merges sorted sequences. Guarantees predictable O(n log n) runtime at the cost of O(n) auxiliary space.</p>
+        <div class="card-stats">
+          <span>Best: O(n log n)</span>
+          <span>Avg: O(n log n)</span>
+          <span>Worst: O(n log n)</span>
+          <span>Space: O(n)</span>
+        </div>
+      </div>
+
+      <div class="algo-card" id="card-quick">
+        <div class="card-header-line">
+          <div class="card-tag tag-violet">O(n log n)</div>
+          <span class="card-stability">Unstable</span>
+        </div>
+        <h3>Quick Sort</h3>
+        <p>Partitions the array around a chosen pivot so elements smaller than the pivot precede larger ones, then recurses. Excellent cache performance and practical speed; worst-case O(n²) on unbalanced pivots.</p>
+        <div class="card-stats">
+          <span>Best: O(n log n)</span>
+          <span>Avg: O(n log n)</span>
+          <span>Worst: O(n²)</span>
+          <span>Space: O(log n)</span>
         </div>
       </div>
     </section>
@@ -126,10 +283,11 @@
   </main>
 
   <footer>
-    <span>Built with HTML · CSS · JavaScript</span>
+    <span>SortLab</span>
     <span class="footer-dot">·</span>
-    <span>DSA Sorting Visualizer</span>
+    <span>Algorithm Performance &amp; Decision Lab</span>
     <span class="footer-dot">·</span>
+    <span>Vanilla HTML · CSS · JavaScript</span>
   </footer>
 
   <script src="script.js"></script>
